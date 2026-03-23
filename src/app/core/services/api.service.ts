@@ -115,6 +115,20 @@ getPublishedAgendasLatest(): Observable<ApiResponse<Agenda[]>> {
     return this.http.get<ApiResponse<Page<Article>>>(`${this.API_URL}/public/articles`, { params });
   }
 
+  // Service pour récupérer les articles par catégorie
+getArticlesByCategory(category: string, page: number = 0, size: number = 10): Observable<ApiResponse<Page<Article>>> {
+  const params = new HttpParams()
+    .set('page', page)
+    .set('size', size);
+
+  return this.http.get<ApiResponse<Page<Article>>>(`${this.API_URL}/public/articles/category/${category}`, { params });
+}
+
+  getAllCommuniques(): Observable<Article[]> {
+  // Si ton backend accepte un paramètre "all=true"
+  return this.http.get<Article[]>(`${this.API_URL}/public/articles`, { params: new HttpParams().set('category', 'COMMUNIQUE').set('all', 'true') });
+}
+
   getLatestArticles(): Observable<ApiResponse<Article[]>> {
     return this.http.get<ApiResponse<Article[]>>(`${this.API_URL}/public/articles/latest`);
   }

@@ -8,7 +8,7 @@ import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-detail-articles',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ],
   templateUrl: './detail-articles.component.html',
   styleUrls: ['./detail-articles.component.scss']
 })
@@ -18,6 +18,7 @@ export class DetailArticlesComponent {
 
   article = signal<Article | null>(null);
   loading = signal(true);
+  agendas = signal<Article[]>([]);
   
   constructor(
     private route: ActivatedRoute,
@@ -29,6 +30,8 @@ export class DetailArticlesComponent {
     if (id) {
       this.loadArticle(+id);
     }
+
+    this.loadArticles();
   }
   
   loadArticle(id: number): void {
@@ -79,6 +82,53 @@ formatContent(content: string): string {
     return path ? this.API_URL + path : null;
    
   }
+
+
+  loadArticles(): void {
+  this.loading.set(true);
+  this.apiService.getPublishedArticles().subscribe({
+    next: (response) => {
+      if (response.success) {
+
+        const actualiteArticles = response.data.content
+          .filter((article: any) => article.category === 'ACTUALITE')
+          .sort((a: any, b: any) => 
+            new Date(b.createdAt).getTime() - new Date(a.publishedAt).getTime()
+          )
+          .slice(0, 5);
+
+        this.agendas.set(actualiteArticles);
+      }
+
+      this.loading.set(false);
+    },
+    error: () => this.loading.set(false)
+  });
+}
+
+ 
+   loadArticles1(): void {
+    this.loading.set(true);
+    this.apiService.getPublishedArticles().subscribe({
+      next: (response) => {
+        if (response.success) {
+
+          const actualiteArticles = response.data.content.filter(
+          (article: any) => article.category === 'ACTUALITE'
+          );
+          this.agendas.set(actualiteArticles);
+
+          //this.articles.set(response.data.content);
+         // console.log(this.articles());
+          
+        }
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false)
+    });
+  }
+
+
 
 
 

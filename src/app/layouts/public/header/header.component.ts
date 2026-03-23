@@ -1,6 +1,6 @@
 import { Component, signal, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { Ministere } from '../../../core/models/event.model';
 import { environment } from '../../../../environments/environment';
@@ -16,6 +16,7 @@ imports: [CommonModule, RouterLink, RouterLinkActive],
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
+  activeSection: string = '';
    loading = signal(true);
     private authService = inject(AuthService);
      private readonly API_URL = environment.FileUrl;
@@ -29,6 +30,8 @@ export class HeaderComponent {
      ministeres= signal<Ministere[]>([]);
      ministere1!: Ministere;
      ministere = signal<Ministere | null>(null); 
+
+     constructor(private router: Router) {}
 
 
       ngOnInit() {
@@ -115,5 +118,77 @@ export class HeaderComponent {
     return path ? this.API_URL + path : null;
    
   }
+
+
+setActive(section: string) {
+  this.activeSection = section; // pour le scroll ou menu
+}
+
+@HostListener('window:scroll', [])
+onScroll(): void {
+  if (this.router.url !== '/') return;
+
+  const sections = ['hero', 'projets', 'actualites'];
+  let currentSection = '';
+
+  for (let section of sections) {
+    const element = document.getElementById(section);
+    if (element) {
+      const rect = element.getBoundingClientRect();
+      // si le haut de la section est visible ou passé
+      if (rect.top <= 150) {
+        currentSection = section;
+      }
+    }
+  }
+
+  this.activeSection = currentSection; // '' si aucune n’est passée
+}
+
+goToAccueil() {
+  this.activeSection = ''; // réinitialise la section active
+  this.router.navigate(['/']).then(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+goToSection(section: string) {
+  this.activeSection = ''; // 🔥 Réinitialise tout avant scroll
+  if (this.router.url !== '/') {
+    this.router.navigate(['/']).then(() => {
+      setTimeout(() => this.scrollTo(section), 100);
+    });
+  } else {
+    this.scrollTo(section);
+  }
+}
+
+scrollTo(section: string) {
+  const element = document.getElementById(section);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+// Liste de toutes les routes enfants du menu Ressources
+ressourcesRoutes = ['/ressources/documents', '/ressources/politiques', '/faq'];
+
+isRessourcesActive(): boolean {
+  // Si la route actuelle contient une des routes enfants, parent devient actif
+  return this.ressourcesRoutes.some(route => this.router.url.startsWith(route));
+}
+
+// Liste des routes enfants du menu Ministère
+ministereRoutes = [
+  '/ministere/ministre',
+  '/ministere/missions',
+  '/ministere/organigramme',
+  '/ministere/structures'
+];
+
+// Fonction pour savoir si le parent Ministère doit être actif
+isMinistereActive(): boolean {
+  return this.ministereRoutes.some(route => this.router.url.startsWith(route));
+}
 
 }

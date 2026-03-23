@@ -6,7 +6,7 @@ import { RouterLink } from '@angular/router';
 
 import { interval, Subscription } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
-import { Agenda, Article, Project, Service } from '../../../core/models';
+import { Agenda, ApiResponse, Article, Page, Project, Service } from '../../../core/models';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import { environment } from '../../../../environments/environment';
@@ -52,6 +52,7 @@ private etatService = inject(MinistereService);
    ministere = signal<Ministere | null>(null); 
 
   articles = signal<Article[]>([]);
+  allActualites = signal<Article[]>([]);
   communiques = signal<Article[]>([]);
   projects = signal<Project[]>([]);
   isLoading = signal(false);
@@ -61,6 +62,39 @@ private etatService = inject(MinistereService);
   newArticleIds = signal<Map<number, Date>>(new Map()); // pour garder la date de nouveauté
 
   private readonly REFRESH_INTERVAL = 30000; // 30 sec
+
+
+// Signals pour gérer l'état
+  
+  showAll = signal(false);
+  currentPage = signal(1);
+  pageSizeReduced = 6;
+  pageSizeFull = 9;
+  totalPages = signal(1);
+  pageSize = 9; 
+
+  // Signaux pour Communiqués
+
+commCurrentPage = signal(1);
+commPageSize = 6; // 6 communiqués par page
+commTotalPages = signal(1);
+commShowAll = signal(false); // true = mode voir tous
+
+
+// =======================
+latestAgendas: Agenda[] = [];   // Derniers 3 agendas
+agendas = signal<Agenda[]>([]); // Tous les agendas pour pagination
+showAllAgendas = signal(false); // Affichage complet ou réduit
+currentAgendaPage = signal(1);  // Page actuelle
+pageSizeAgenda = 6;             // Nombre par page
+totalAgendaPages = signal(1);   // Total de pages
+isLoadingAgendas = signal(false);
+
+
+showAllProjects = signal(false);
+currentProjectPage = signal(1);
+pageSizeProject = 6;
+totalProjectPages = signal(1);
 
   ngOnInit() {
     this.loadMinistere();
@@ -81,6 +115,8 @@ private etatService = inject(MinistereService);
     this.loadLatestAgendas();
     this.loadServices();
     this.loadStats();
+    this.loadCommuniquesInitial();
+    this.loadAgendas();
 
   }
 
@@ -177,9 +213,112 @@ private etatService = inject(MinistereService);
       }
     });
   }
+loadArticles(page: number = 0) {
+  this.isLoading.set(true);
+  const size = this.showAll() ? this.pageSizeFull : this.pageSizeReduced;
+
+  this.apiService.getArticlesByCategory('ACTUALITE', page, size).subscribe({
+    next: (response: any) => {
+      // récupérer le contenu de la page
+      const data: Article[] = Array.isArray(response?.data?.content)
+        ? response.data.content
+        : [];
+
+      this.articles.set(data);
+
+      // mettre à jour la pagination
+      this.totalPages.set(response.data.totalPages || 1);
+      this.currentPage.set(page + 1); // backend commence à 0
+
+      this.lastUpdate.set(new Date());
+      this.isLoading.set(false);
+    },
+    error: (err) => {
+      console.error('Erreur chargement actualités:', err);
+      this.isLoading.set(false);
+    }
+  });
+}
+
+  voirToutesActualites() {
+    this.showAll.set(true);
+    this.loadArticles(0); // page 0 côté backend
+  }
+
+  reduireArticles() {
+    this.showAll.set(false);
+    this.loadArticles(0); // récupère les 6 derniers
+  }
+
+  nextPage() {
+    if (this.currentPage() < this.totalPages()) {
+      this.loadArticles(this.currentPage()); // page index = currentPage (0-based)
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage() > 1) {
+      this.loadArticles(this.currentPage() - 2); // page index = currentPage - 2
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+  
+// Chargement initial (mode réduit, 3 communiqués)
+// Chargement initial : 3 communiqués
+loadCommuniquesInitial() {
+  this.isLoading.set(true);
+  this.apiService.getArticlesByCategory('COMMUNIQUE', 0, 3)
+    .subscribe({
+      next: (res: ApiResponse<Page<Article>>) => {
+        this.communiques.set(res.data.content);
+        this.commTotalPages.set(res.data.totalPages || 1);
+        this.commCurrentPage.set(1);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Erreur chargement communiqués', err);
+        this.isLoading.set(false);
+      }
+    });
+}
+
+// Voir tous les communiqués (6 par page)
+voirTousCommuniques(page: number = 0) {
+  this.isLoading.set(true);
+  this.commShowAll.set(true);
+
+  this.apiService.getArticlesByCategory('COMMUNIQUE', page, this.commPageSize)
+    .subscribe({
+      next: (res: ApiResponse<Page<Article>>) => {
+        this.communiques.set(res.data.content);
+        this.commTotalPages.set(res.data.totalPages || 1);
+        this.commCurrentPage.set(page + 1);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Erreur chargement communiqués', err);
+        this.isLoading.set(false);
+      }
+    });
+}
+
+// Pagination
+nextCommPage() {
+  if (this.commCurrentPage() < this.commTotalPages()) {
+    this.voirTousCommuniques(this.commCurrentPage());
+  }
+}
+
+prevCommPage() {
+  if (this.commCurrentPage() > 1) {
+    this.voirTousCommuniques(this.commCurrentPage() - 2);
+  }
+}
 
 
-  loadArticles() {
+
+  loadArticles2() {
   this.isLoading.set(true);
   this.apiService.getPublishedArticles().subscribe({
     next: (response: any) => {
@@ -230,7 +369,57 @@ private etatService = inject(MinistereService);
     });
   }
 
-  loadProjects() {
+  // Charger les 3 projets récents
+loadProjects() {
+  this.apiService.getPublicProjects().subscribe({
+    next: (response: any) => {
+      const allData: Project[] = Array.isArray(response?.data?.content) 
+        ? response.data.content 
+        : Array.isArray(response) 
+          ? response 
+          : [];
+
+      // Trier par date décroissante
+      const sortedProjects = allData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      if (this.showAllProjects()) {
+        // Pagination si on affiche tous
+        this.totalProjectPages.set(Math.ceil(sortedProjects.length / this.pageSizeProject));
+        const start = (this.currentProjectPage() - 1) * this.pageSizeProject;
+        const end = start + this.pageSizeProject;
+        this.projects.set(sortedProjects.slice(start, end));
+      } else {
+        // Sinon juste les 3 premiers
+        this.projects.set(sortedProjects.slice(0, 4));
+      }
+    },
+    error: (err) => console.error('Erreur chargement projets:', err)
+  });
+}
+
+// Voir tous les projets avec pagination
+voirTousProjets() {
+  this.showAllProjects.set(true);
+  this.currentProjectPage.set(1);
+  this.loadProjects();
+}
+
+// Pagination : page suivante
+nextProjectPage() {
+  if (this.currentProjectPage() < this.totalProjectPages()) {
+    this.currentProjectPage.set(this.currentProjectPage() + 1);
+    this.loadProjects();
+  }
+}
+
+// Pagination : page précédente
+prevProjectPage() {
+  if (this.currentProjectPage() > 1) {
+    this.currentProjectPage.set(this.currentProjectPage() - 1);
+    this.loadProjects();
+  }
+}
+  loadProjects2() {
   this.apiService.getPublicProjects().subscribe({
     next: (response: any) => {
       // Sécuriser la récupération de data
@@ -256,18 +445,65 @@ private etatService = inject(MinistereService);
   });
 }
 
-latestAgendas: Agenda[] = [];
-services: Service[] = [];
+//latestAgendas: Agenda[] = [];
+service: Service[] = [];
 
 loadLatestAgendas() {
   this.apiService.getPublishedAgendasLatest().subscribe({
     next: (res) => {
       if (res.success) {
-        this.latestAgendas = res.data;
+        this.latestAgendas = res.data.slice(0, 3); // juste les 3 derniers
       }
     },
     error: (err) => console.error(err)
   });
+}
+
+
+// =======================
+// Charger tous les agendas avec pagination
+// =======================
+// Charger tous les agendas avec pagination
+loadAgendas(page: number = 0) {
+  this.isLoadingAgendas.set(true);
+
+  this.apiService.getPublishedAgendas(page, this.pageSizeAgenda).subscribe({
+    next: (res) => {
+      if (res.success) {
+        this.agendas.set(res.data.content || []);
+        this.totalAgendaPages.set(res.data.totalPages || 1);
+        this.currentAgendaPage.set(page + 1); // backend pages start at 0
+      }
+      this.isLoadingAgendas.set(false);
+    },
+    error: (err) => {
+      console.error('Erreur chargement agendas:', err);
+      this.isLoadingAgendas.set(false);
+    }
+  });
+}
+
+// =======================
+// Afficher tous les agendas
+// =======================
+voirTousAgendas() {
+  this.showAllAgendas.set(true);
+  this.loadAgendas(0);
+}
+
+// =======================
+// Pagination
+// =======================
+nextAgendaPage() {
+  if (this.currentAgendaPage() < this.totalAgendaPages()) {
+    this.loadAgendas(this.currentAgendaPage());
+  }
+}
+
+prevAgendaPage() {
+  if (this.currentAgendaPage() > 1) {
+    this.loadAgendas(this.currentAgendaPage() - 2);
+  }
 }
 
 loadStats() {
@@ -283,11 +519,78 @@ loadStats() {
   });
 }
 
+// Services
+services = signal<Service[]>([]);
+allServices = signal<Service[]>([]);
+
+showAllServices = signal(false);
+currentServicePage = signal(1);
+totalServicePages = signal(1);
+
+pageSizeInitial = 4; // affichage accueil
+pageSizeFulls = 8;    // pagination
+
+
+// Charger tous les services
 loadServices() {
   this.apiService.getAllServicepublic().subscribe({
     next: (res) => {
       if (res.success) {
-        this.services = res.data.content;
+        const data: Service[] = res.data.content || [];
+
+        this.allServices.set(data);
+
+        // calcul pages
+        this.totalServicePages.set(
+          Math.ceil(data.length / this.pageSizeFulls)
+        );
+
+        this.updateDisplayedServices();
+      }
+    },
+    error: (err) => console.error(err)
+  });
+}
+
+// Mise à jour affichage
+updateDisplayedServices() {
+  if (this.showAllServices()) {
+    const start = (this.currentServicePage() - 1) * this.pageSizeFulls;
+    const end = start + this.pageSizeFulls;
+
+    this.services.set(this.allServices().slice(start, end));
+  } else {
+    this.services.set(this.allServices().slice(0, this.pageSizeInitial));
+  }
+}
+
+// Voir tous
+voirTousServices() {
+  this.showAllServices.set(true);
+  this.currentServicePage.set(1);
+  this.updateDisplayedServices();
+}
+
+// Pagination
+nextServicePage() {
+  if (this.currentServicePage() < this.totalServicePages()) {
+    this.currentServicePage.set(this.currentServicePage() + 1);
+    this.updateDisplayedServices();
+  }
+}
+
+prevServicePage() {
+  if (this.currentServicePage() > 1) {
+    this.currentServicePage.set(this.currentServicePage() - 1);
+    this.updateDisplayedServices();
+  }
+}
+
+loadServices1() {
+  this.apiService.getAllServicepublic().subscribe({
+    next: (res) => {
+      if (res.success) {
+        this.service = res.data.content;
         console.log(this.services)
       }
     },

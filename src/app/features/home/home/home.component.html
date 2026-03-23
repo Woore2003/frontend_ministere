@@ -189,131 +189,80 @@
 
 
     <!-- Actualités -->
-
-<section class="py-16 bg-white">
+<section class="py-16 bg-white" id="actualites">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
     <div class="flex items-center justify-between mb-8">
       <div>
-        <div class="flex items-center gap-3">
-          <h2 class="text-2xl font-bold text-slate-800">Les dernières Actualités</h2>
-          
-        </div>
-        <p class="text-slate-600 mt-1">Restez informé des dernières nouvelles </p>
+        <h2 class="text-2xl font-bold text-slate-800">Les dernières Actualités</h2>
+        <p class="text-slate-600 mt-1">Restez informé des dernières nouvelles</p>
       </div>
 
       <div class="hidden sm:flex items-center gap-4">
-        <button (click)="refreshArticles()" 
+        <button (click)="loadArticles()" 
                 class="inline-flex items-center gap-2 px-4 py-2 border border-slate-200 text-slate-600 font-medium rounded-lg hover:bg-slate-50 transition-colors"
                 [disabled]="isLoading()">
-          <svg class="w-4 h-4" [class.animate-spin]="isLoading()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-          </svg>
           Actualiser
         </button>
-        <a routerLink="/actualites" 
-           class="inline-flex items-center gap-2 text-primary-600 font-medium hover:text-primary-700 transition-colors whitespace-nowrap">
-          Voir toutes les actualités
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-          </svg>
+
+        <a (click)="showAll() ? reduireArticles() : voirToutesActualites()"
+           class="inline-flex items-center gap-2 text-primary-600 font-medium hover:text-primary-700 cursor-pointer">
+          {{ showAll() ? 'Réduire' : 'Voir toutes les actualités' }}
         </a>
       </div>
     </div>
 
-    <!-- Grille d'actualités -->
-  <ng-container *ngIf="articles().length > 0; else noArticles">
-     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <ng-container *ngIf="articles().length > 0; else noArticles">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @for (article of articles(); track article.id) {
           <a [routerLink]="['/articles', article.id]" class="card group cursor-pointer flex flex-col h-full bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden">
-            
-            <!-- Image -->
-          <div class="h-48 bg-[#E6F5EB] flex items-center justify-center overflow-hidden">
-            @if (article.featuredImage) {
-              <img
-                [src]="getImageUrl(article.featuredImage)"
-                [alt]="article.title"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              > 
+            <div class="h-48 bg-[#E6F5EB] flex items-center justify-center overflow-hidden">
+              @if (article.featuredImage) {
+                <img [src]="getImageUrl(article.featuredImage)" [alt]="article.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+              } @else {
+                <svg class="w-16 h-16 text-[#00843B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                </svg>
+              }
+            </div>
 
-              
-            } @else {
-              <svg class="w-16 h-16 text-[#00843B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z">
-                </path>
-              </svg>
-            }
-          </div>
-
-
-
-            <!-- Titre -->
-             <h3 class="text-xl font-bold text-black mb-2 px-4 pt-2 line-clamp-1">
-                {{ article.title }}
-            </h3>
-
-
-
-            <!-- Date, statut et vues -->
+            <h3 class="text-xl font-bold text-black mb-2 px-4 pt-2 line-clamp-1">{{ article.title }}</h3>
             <div class="flex justify-between items-center text-sm text-neutral-500 px-4 mb-2">
               <span>{{ formatDate(article.publishedAt || article.createdAt) }}</span>
               <span class="flex items-center gap-2">
-                <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-[#E6F5EB] text-[#00843B]">
-                  {{ getCategoryLabel(article.category) }}
-                </span>
+                <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-[#E6F5EB] text-[#00843B]">{{ getCategoryLabel(article.category) }}</span>
                 <span>{{ article.viewCount }} vues</span>
               </span>
             </div>
-
-            <p class="text-neutral-700 text-sm leading-relaxed text-justify px-4 mb-4 line-clamp-4">
-            {{ article.summary }}
-            </p>
-
-            <!-- Résumé 
-            <p class="text-neutral-700 text-sm px-4 mb-4 line-clamp-4">
-              {{ article.summary }}
-            </p>-->
-
-            <!-- Bouton "En savoir plus" -->
-            <div class="mt-auto px-4 pb-4 flex justify-end">
-              <span class="bg-[#00843B] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#006B30] transition">
-                En savoir plus
-              </span>
-            </div>
-
+            <p class="text-neutral-700 text-sm leading-relaxed text-justify px-4 mb-4 line-clamp-4">{{ article.summary }}</p>
           </a>
         }
       </div>
-  </ng-container>
+    </ng-container>
 
     <ng-template #noArticles>
       <div class="text-center py-12 bg-white rounded-xl border border-slate-100">
-        <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
-        </svg>
         <h3 class="text-lg font-semibold text-slate-700 mb-2">Aucune actualité disponible</h3>
         <p class="text-slate-500">Les actualités seront affichées ici dès leur publication.</p>
       </div>
     </ng-template>
 
-  
+    <!-- Pagination backend -->
+    <div *ngIf="showAll()" class="flex justify-center items-center gap-4 mt-8">
+      <button (click)="prevPage()" [disabled]="currentPage() <= 1" class="px-4 py-2 border rounded-lg disabled:opacity-50">
+        Précédent
+      </button>
 
-    <!-- Dernière mise à jour -->
-    <div class="flex items-center justify-between mt-6 pt-4 border-t border-slate-200">
-      <p class="text-xs text-slate-400">
-        Dernière mise à jour : {{ lastUpdate() | date:'dd/MM/yyyy à HH:mm:ss':'':'fr' }}
-      </p>
-      <div class="sm:hidden">
-        <a routerLink="/actualites" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors whitespace-nowrap">
-          Voir toutes les actualités
-        </a>
-      </div>
+      <span class="text-sm font-medium">Page {{ currentPage() }} / {{ totalPages() }}</span>
+
+      <button (click)="nextPage()" [disabled]="currentPage() >= totalPages()" class="px-4 py-2 border rounded-lg disabled:opacity-50">
+        Suivant
+      </button>
     </div>
   </div>
 </section>
 
-
-  <!--  communiqué et agenda - -->
 <section class="py-16 bg-slate-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     
@@ -327,114 +276,146 @@
       </h2>
     </div>
 
-    <!-- Grille pour Communiqués & Agenda -->
+    <!-- Grille Communiqués & Agenda -->
     <div class="grid lg:grid-cols-2 gap-12">
-      
-      <!-- Communiqués -->
-        <ng-container *ngIf="communiques().length > 0; else noCommuniquess">
-          @for (com of communiques(); track com.id) {
 
-             <div class="flex flex-col justify-between space-y-6">
-              <div class="space-y-6">
-                <!-- Communiqué 1 -->
-                 <a [href]="getImageUrl(com?.featuredImage)" target="_blank">
-                  <div  class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-shadow relative overflow-hidden cursor-pointer">
-                    <div class="flex items-start gap-6">
-                      <div class="flex-shrink-0 flex items-center justify-center w-16 h-16 rounded-full border-2"
-                          style="border-color: rgb(231, 76, 60); background-color: white;">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-[rgb(231,76,60)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5v14l7-7-7-7z" />
-                        </svg>
+      <!-- Communiqués -->
+      <div class="flex flex-col space-y-6">
+        <div class="space-y-6">
+          <ng-container *ngIf="communiques().length > 0; else noCommuniquess">
+            @for (com of communiques(); track com.id) {
+              <a [href]="getImageUrl(com?.featuredImage)" target="_blank">
+                <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-shadow relative overflow-hidden cursor-pointer mb-4">
+                  <div class="flex items-start gap-6">
+                    <div class="flex-shrink-0 flex items-center justify-center w-16 h-16 rounded-full border-2"
+                        style="border-color: rgb(231, 76, 60); background-color: white;">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-[rgb(231,76,60)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5v14l7-7-7-7z" />
+                      </svg>
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium" style="color: rgb(231, 76, 60);">
+                          {{ formatDate(com.publishedAt || com.createdAt) }}
+                        </span>
+                        <span class="text-xs text-slate-400 uppercase">{{ getCategoryLabel(com.category) }}</span>
                       </div>
-                      <div class="flex-1">
-                        <div class="flex justify-between items-center mb-2">
-                          <span class="text-sm font-medium" style="color: rgb(231, 76, 60);">{{ formatDate(com.publishedAt || com.createdAt) }}</span>
-                          <span class="text-xs text-slate-400 uppercase">{{ getCategoryLabel(com.category) }}</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-2 line-clamp-2">
-                          {{ com.title }}
-                        </h3>
-                        <p class="text-slate-600 text-sm leading-relaxed line-clamp-2 mb-4">
-                        {{ com.summary }}  </p>
-                      </div>
+                      <h3 class="text-xl font-bold text-slate-800 mb-2 line-clamp-2">{{ com.title }}</h3>
+                      <p class="text-slate-600 text-sm leading-relaxed line-clamp-2 mb-4">{{ com.summary }}</p>
                     </div>
                   </div>
-                </a>
+                </div>
+              </a>
+            }
+          </ng-container>
 
-              
-              </div>
-
-              <!-- Bouton Voir tous les communiqués aligné bas -->
-              <div class="text-center mt-6">
-                <a routerLink="/communiques" class="inline-block px-6 py-3 bg-[rgb(231,76,60)] text-white font-medium rounded-lg hover:bg-[rgb(200,50,40)] transition-colors shadow-sm">
-                  Voir tous les communiqués →
-                </a>
-              </div>
-            </div>
-
-
-
-          }
-
-        </ng-container>
-
-        <ng-template #noCommuniquess>
-          
+          <ng-template #noCommuniquess>
             <h3 class="text-lg font-semibold text-slate-700 mb-2">Aucun communiqué disponible</h3>
-           
-        </ng-template>
-     
+          </ng-template>
+        </div>
 
-      <!-- Agenda -->
-      <div class="flex flex-col justify-between space-y-6">
-        <div class="space-y-6">
+        <!-- Bouton Voir tous les communiqués -->
+        <div class="mt-auto text-center" *ngIf="!commShowAll()">
+          <a (click)="voirTousCommuniques()"
+             class="inline-block px-6 py-3 bg-[rgb(231,76,60)] text-white font-medium rounded-lg hover:bg-[rgb(200,50,40)] transition-colors shadow-sm cursor-pointer">
+            Voir tous les communiqués →
+          </a>
+        </div>
 
-          <div *ngFor="let agenda of latestAgendas" 
-              class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-shadow cursor-pointer group">
+        <!-- Pagination Communiqués -->
+        <div *ngIf="commShowAll() && commTotalPages() > 1" class="flex justify-center items-center gap-4 mt-6">
+          <button (click)="prevCommPage()"
+                  [disabled]="commCurrentPage() === 1"
+                  class="px-4 py-2 border rounded-lg disabled:opacity-50">Précédent</button>
 
-            <div class="flex items-center gap-4" [routerLink]="['/agendas', agenda.id]">
+          <span class="text-sm font-medium">Page {{ commCurrentPage() }} / {{ commTotalPages() }}</span>
 
-              <!-- Date -->
+          <button (click)="nextCommPage()"
+                  [disabled]="commCurrentPage() >= commTotalPages()"
+                  class="px-4 py-2 border rounded-lg disabled:opacity-50">Suivant</button>
+        </div>
+      </div>
+
+      <div class="flex flex-col space-y-6">
+
+        <!-- Affichage des 3 derniers agendas -->
+        <ng-container *ngIf="!showAllAgendas() && latestAgendas.length > 0; else allAgendasBlock">
+          <div *ngFor="let agenda of latestAgendas"
+              class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-shadow cursor-pointer group"
+              [routerLink]="['/agendas', agenda.id]">
+            <div class="flex items-center gap-4">
               <div class="flex-shrink-0 w-16 h-16 rounded-full flex flex-col items-center justify-center bg-[rgb(231,76,60)] text-white font-bold text-sm">
                 <span class="text-lg">{{ agenda.publishedAt | date:'dd' }}</span>
                 <span class="text-xs uppercase">{{ agenda.publishedAt | date:'MMM' }}</span>
               </div>
-
               <div class="flex-1">
-
-                <!-- Title + Status -->
                 <div class="flex justify-between items-center mb-2">
-                  <span class="text-sm font-medium text-[rgb(231,76,60)]">
-                    {{ agenda.title }}
-                  </span>
-
-                  <span class="text-xs font-medium text-slate-400 uppercase">
-                    {{ agenda.lieux }}
-                  </span>
+                  <span class="text-sm font-medium text-[rgb(231,76,60)]">{{ agenda.title }}</span>
+                  <span class="text-xs font-medium text-slate-400 uppercase">{{ agenda.lieux }}</span>
                 </div>
+                <p class="text-slate-700 font-medium line-clamp-2">{{ agenda.summary }}</p>
+              </div>
+            </div>
+          </div>
 
-                <!-- Summary -->
-                <p class="text-slate-700 font-medium line-clamp-2">
-                  {{ agenda.summary }}
-                </p>
+          <!-- Bouton Voir tout l'agenda -->
+          <div class="mt-6 text-center">
+            <a (click)="voirTousAgendas()"
+              class="inline-block px-6 py-3 bg-[rgb(231,76,60)] text-white font-medium rounded-lg hover:bg-[rgb(200,50,40)] transition-colors shadow-sm cursor-pointer">
+              Voir tout l'agenda →
+            </a>
+          </div>
+        </ng-container>
 
+        <!-- Bloc pour tous les agendas avec pagination -->
+        <ng-template #allAgendasBlock>
+          <ng-container *ngIf="agendas().length > 0; else noAgendas">
+            <div *ngFor="let agenda of agendas()"
+                class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-shadow cursor-pointer group"
+                [routerLink]="['/agendas', agenda.id]">
+              <div class="flex items-center gap-4">
+                <div class="flex-shrink-0 w-16 h-16 rounded-full flex flex-col items-center justify-center bg-[rgb(231,76,60)] text-white font-bold text-sm">
+                  <span class="text-lg">{{ agenda.publishedAt | date:'dd' }}</span>
+                  <span class="text-xs uppercase">{{ agenda.publishedAt | date:'MMM' }}</span>
+                </div>
+                <div class="flex-1">
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium text-[rgb(231,76,60)]">{{ agenda.title }}</span>
+                    <span class="text-xs font-medium text-slate-400 uppercase">{{ agenda.lieux }}</span>
+                  </div>
+                  <p class="text-slate-700 font-medium line-clamp-2">{{ agenda.summary }}</p>
+                </div>
               </div>
             </div>
 
-          </div>
+            <!-- Pagination -->
+            <div *ngIf="totalAgendaPages() > 1" class="flex justify-center items-center gap-4 mt-8">
+              <button (click)="prevAgendaPage()"
+                      [disabled]="currentAgendaPage() === 1"
+                      class="px-4 py-2 border rounded-lg disabled:opacity-50">
+                Précédent
+              </button>
 
-       
+              <span class="text-sm font-medium">
+                Page {{ currentAgendaPage() }} / {{ totalAgendaPages() }}
+              </span>
 
-         
-         
-        </div>
+              <button (click)="nextAgendaPage()"
+                      [disabled]="currentAgendaPage() >= totalAgendaPages()"
+                      class="px-4 py-2 border rounded-lg disabled:opacity-50">
+                Suivant
+              </button>
+            </div>
+          </ng-container>
 
-        <!-- Bouton Voir tout l’agenda aligné bas -->
-        <div class="text-center mt-6">
-          <a routerLink="/agendas"  class="inline-block px-6 py-3 bg-[rgb(231,76,60)] text-white font-medium rounded-lg hover:bg-[rgb(200,50,40)] transition-colors shadow-sm">
-            Voir tout l’agenda →
-          </a>
-        </div>
+          <!-- Cas aucun agenda -->
+          <ng-template #noAgendas>
+            <div class="text-center py-12 bg-white rounded-xl border border-slate-100">
+              <h3 class="text-lg font-semibold text-slate-700 mb-2">Aucun agenda disponible</h3>
+              <p class="text-slate-500">Les agendas seront affichés ici dès leur publication.</p>
+            </div>
+          </ng-template>
+        </ng-template>
       </div>
 
     </div>
@@ -442,8 +423,100 @@
 </section>
 
 
-   <!-- Projets -->
-<section class="py-16 bg-white-50" >
+
+<section class="py-16 bg-white-50" id="projets">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="text-2xl font-bold text-slate-800">Les grands chantiers</h2>
+        <p class="text-slate-600 mt-1">Nos initiatives pour la transformation digitale</p>
+      </div>
+      <!-- Bouton Voir tous (optionnel) -->
+      <button *ngIf="!showAllProjects()" (click)="voirTousProjets()" 
+         class="hidden sm:inline-flex items-center gap-2 px-4 py-2 border border-[#00843B] bg-white text-[#00843B] font-medium rounded-lg hover:bg-[#f0fdf4] transition-colors">
+        Voir les autres
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Liste des projets -->
+    <ng-container *ngIf="projects().length > 0; else noProjects">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        @for (project of projects(); track project.id) {
+          <a [routerLink]="['/projects', project.id]" class="card group cursor-pointer p-6 bg-white rounded-xl shadow hover:shadow-lg transition-shadow">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <span [class]="getStatusBadgeClass(project.status)">{{ getStatusLabel(project.status) }}</span>
+                <h3 class="text-xl font-bold text-black mb-2 px-4 pt-2 line-clamp-1" style="font-family: 'Poppins', sans-serif;">
+                  {{ project.name }}
+                </h3>
+              </div>
+              <div class="w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 ml-4"
+                   [style.backgroundColor]="getProgressBarColor(project)">
+                <span [style.color]="getContrastTextColor(getProgressBarColor(project))" class="text-2xl font-bold">
+                  {{ project.progressPercentage }}%
+                </span>
+              </div>
+            </div>
+            <p class="text-neutral-500 mb-4 line-clamp-2">{{ project.description }}</p>
+            <div class="w-full bg-neutral-200 rounded-full h-2 mb-4">
+              <div [class]="getProgressBarClass(project)" [style.width.%]="project.progressPercentage"></div>
+            </div>
+            <div class="flex flex-wrap items-center gap-4 text-sm text-neutral-400">
+              @if (project.partner) {
+                <span class="flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="..."></path>
+                  </svg>
+                  {{ project.partner }}
+                </span>
+              }
+              @if (project.budget) {
+                <span class="flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="..."></path>
+                  </svg>
+                  {{ formatBudget(project.budget) }}
+                </span>
+              }
+            </div>
+          </a>
+        }
+      </div>
+    </ng-container>
+
+    <!-- Pagination -->
+    <div *ngIf="showAllProjects() && totalProjectPages() > 1" class="flex justify-center items-center gap-4 mt-8">
+      <button (click)="prevProjectPage()" [disabled]="currentProjectPage() === 1"
+              class="px-4 py-2 border rounded-lg disabled:opacity-50">
+        Précédent
+      </button>
+
+      <span class="text-sm font-medium">Page {{ currentProjectPage() }} / {{ totalProjectPages() }}</span>
+
+      <button (click)="nextProjectPage()" [disabled]="currentProjectPage() >= totalProjectPages()"
+              class="px-4 py-2 border rounded-lg disabled:opacity-50">
+        Suivant
+      </button>
+    </div>
+
+    <!-- Aucun projet -->
+    <ng-template #noProjects>
+      <div class="text-center py-12 bg-white rounded-xl border border-slate-100">
+        <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v8m4-4H8"/>
+        </svg>
+        <h3 class="text-lg font-semibold text-slate-700 mb-2">Aucun projet disponible</h3>
+        <p class="text-slate-500">Les projets seront affichés ici dès leur publication.</p>
+      </div>
+    </ng-template>
+  </div>
+</section>
+
+   <!-- Projets
+<section class="py-16 bg-white-50" id="projets">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between mb-8">
       <div>
@@ -520,50 +593,7 @@
         }
       </div>
 
-    <!-- Projets <ng-container *ngIf="projects().length > 0; else noProjects">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        @for (project of projects(); track project.id) {
-          <a [routerLink]="['/projects', project.id]" class="card group cursor-pointer p-6 bg-white rounded-xl shadow hover:shadow-lg transition-shadow">
-            <div class="flex items-start justify-between mb-4">
-              <div class="flex-1">
-                <span [class]="getStatusBadgeClass(project.status)">{{ getStatusLabel(project.status) }}</span>
-                <h3 class="text-xl font-semibold text-neutral-900 mt-2 group-hover:text-[#00843B] transition-colors">
-                  {{ project.name }}
-                </h3>
-              </div>
-            </div>
-            <p class="text-neutral-500 mb-4 truncate whitespace-nowrap">
-              {{ project.description }}
-            </p>
-            <div class="flex items-center justify-between text-sm mb-1">
-              <span class="text-slate-500">Progression</span>
-              <span class="font-medium text-primary-600">{{ project.progressPercentage }}%</span>
-            </div>
-            <div class="w-full bg-neutral-200 rounded-full h-2 mb-4">
-              <div [class]="getProgressBarClass(project)" [style.width.%]="project.progressPercentage"></div>
-            </div>
-            <div class="flex flex-wrap items-center gap-4 text-sm text-neutral-400">
-              @if (project.partner) {
-                <span class="flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="..."></path>
-                  </svg>
-                  {{ project.partner }}
-                </span>
-              }
-              @if (project.budget) {
-                <span class="flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="..."></path>
-                  </svg>
-                  {{ formatBudget(project.budget) }}
-                </span>
-              }
-            </div>
-          </a>
-        }
-      </div>
-    </ng-container>-->
+    
 
     <ng-template #noProjects>
       <div class="text-center py-12 bg-white rounded-xl border border-slate-100">
@@ -575,20 +605,116 @@
       </div>
     </ng-template>
   </div>
+</section> -->
+
+
+<section class="py-16 bg-slate-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
+      
+      <div class="text-center sm:text-left">
+        <h2 class="text-2xl font-bold text-slate-800 mb-2">Nos Services publics</h2>
+        <p class="text-slate-600">Accédez rapidement aux services du ministère</p>
+      </div>
+
+      <!-- Bouton dynamique -->
+      <div *ngIf="!showAllServices()">
+        <a (click)="voirTousServices()"
+          class="inline-flex items-center gap-2 px-4 py-2 border border-[#00843B] bg-white text-[#00843B] font-medium rounded-lg hover:bg-[#f0fdf4] transition-colors cursor-pointer">
+          Voir les autres
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+          </svg>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Grid des services -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+      <div *ngFor="let service of services()"
+          (click)="openService(service.url)"
+          class="bg-white p-6 rounded-xl border border-slate-100 shadow-md
+                hover:border-primary-500 hover:shadow-lg transition-all
+                flex flex-col items-center text-center cursor-pointer">
+
+        <!-- Logo -->
+        <div class="w-16 h-16 bg-accent-50 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
+          <img *ngIf="service.logo"
+              [src]="getImageUrl(service.logo)"
+              [alt]="service.name"
+              class="w-12 h-12 object-contain"/>
+
+          <svg *ngIf="!service.logo"
+              class="w-8 h-8 text-accent-500"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+
+        <!-- Nom -->
+        <h3 class="font-semibold text-slate-800 mb-2">
+          {{ service.name }}
+        </h3>
+
+        <!-- Description -->
+        <p class="text-sm text-slate-600 mb-4">
+          {{ service.description }}
+        </p>
+
+        <!-- Lien -->
+        <span class="text-primary-600 text-sm font-medium hover:text-primary-700 transition-colors">
+          En savoir plus →
+        </span>
+
+      </div>
+
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="showAllServices() && totalServicePages() > 1"
+        class="flex justify-center items-center gap-4 mt-8">
+
+      <button 
+        (click)="prevServicePage()"
+        [disabled]="currentServicePage() === 1"
+        class="px-4 py-2 border rounded-lg disabled:opacity-50">
+        Précédent
+      </button>
+
+      <span class="text-sm font-medium">
+        Page {{ currentServicePage() }} / {{ totalServicePages() }}
+      </span>
+
+      <button 
+        (click)="nextServicePage()"
+        [disabled]="currentServicePage() >= totalServicePages()"
+        class="px-4 py-2 border rounded-lg disabled:opacity-50">
+        Suivant
+      </button>
+
+    </div>
+
+  </div>
 </section>
 
-    <!-- Services Cards - Style soft -->
+    <!-- Services Cards - Style soft 
     <section class="py-16 bg-slate-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Header avec titre + bouton -->
+       
         <div class="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
-          <!-- Titre et description -->
+          
           <div class="text-center sm:text-left">
             <h2 class="text-2xl font-bold text-slate-800 mb-2">Nos Services publics</h2>
             <p class="text-slate-600">Accédez rapidement aux services du ministère</p>
           </div>
 
-          <!-- Bouton -->
+         
           <a routerLink="/services" 
             class="inline-flex items-center gap-2 px-4 py-2 border border-[#00843B] bg-white text-[#00843B] font-medium rounded-lg hover:bg-[#f0fdf4] transition-colors">
             Voir les autres
@@ -598,7 +724,7 @@
           </a>
         </div>
 
-        <!-- Grid des services -->
+       
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           <div *ngFor="let service of services | slice:0:4"
               (click)="openService(service.url)"
@@ -606,7 +732,7 @@
                       hover:border-primary-500 hover:shadow-lg transition-all
                       flex flex-col items-center text-center cursor-pointer">
 
-            <!-- Logo / Image -->
+           
             <div class="w-16 h-16 bg-accent-50 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
               <img *ngIf="service.logo" [src]="getImageUrl(service.logo)" alt="{{service.name}}" class="w-12 h-12 object-contain"/>
               <svg *ngIf="!service.logo" class="w-8 h-8 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -615,13 +741,13 @@
               </svg>
             </div>
 
-            <!-- Nom du service -->
+            
             <h3 class="font-semibold text-slate-800 mb-2">{{ service.name }}</h3>
 
-            <!-- Description -->
+           
             <p class="text-sm text-slate-600 mb-4">{{ service.description }}</p>
 
-            <!-- Lien -->
+           
             <span class="text-primary-600 text-sm font-medium hover:text-primary-700 transition-colors">
               En savoir plus →
             </span>
@@ -630,7 +756,7 @@
         </div>
       </div>
     
-    </section>
+    </section>-->
 
 
 
