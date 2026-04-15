@@ -74,6 +74,13 @@ export enum ArticleStatus {
   ARCHIVED = 'ARCHIVED'
 }
 
+
+export interface Articlemage {
+  id: number;
+  imageUrl: string;
+  isFeatured: boolean;
+}
+
 export interface Article {
   id: number;
   title: string;
@@ -89,6 +96,7 @@ export interface Article {
   publishedAt?: string;
   createdAt: string;
   updatedAt?: string;
+  images: Articlemage[];
 }
 
 //eveneent

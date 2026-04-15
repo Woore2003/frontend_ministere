@@ -200,9 +200,11 @@
                 </div>
               </div>
 
+             
+
               <div *ngIf="form.category==='ACTUALITE'">
                 <label class="label">Image mise en avant <span class="text-red-500">*</span></label>
-                <input type="file" (change)="onFileSelected($event)" accept="image/*" class="input">
+                <input type="file" multiple (change)="onFileSelected($event)" accept="image/*" class="input">
               </div>
 
               <div *ngIf="form.category!=='ACTUALITE'">

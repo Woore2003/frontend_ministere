@@ -1,7 +1,7 @@
 import { Component, ChangeDetectorRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
-import { Article, ArticleCategory, ArticleStatus } from '../../../core/models';
+import { Article, ArticleCategory, Articlemage, ArticleStatus } from '../../../core/models';
 import { ApiService } from '../../../core/services/api.service';
 import { Router, RouterModule } from '@angular/router';
 
@@ -22,6 +22,8 @@ notification = signal<{ show: boolean; message: string; type: 'success' | 'error
 });
 
 
+selectedImages: File[] = []; // pour ACTUALITE
+selectedFile: File | null = null; // pour PDF
 
 
   articles = signal<Article[]>([]);
@@ -34,13 +36,14 @@ notification = signal<{ show: boolean; message: string; type: 'success' | 'error
   currentPage = signal(1);
 pageSize = 7; // nombre de projets par page
 totalPages = signal(1);
-  form: { title: string; summary: string; content: string; category: ArticleCategory; status: ArticleStatus; featured: boolean } = {
+  form: { title: string; summary: string; content: string; category: ArticleCategory; status: ArticleStatus; featured: boolean, images: Articlemage[]; } = {
     title: '',
     summary: '',
     content: '',
     category: ArticleCategory.ACTUALITE,
     status: ArticleStatus.DRAFT,
-    featured: false
+    featured: false,
+    images: []
   };
   
   constructor(private apiService: ApiService, private router: Router) {}
@@ -96,24 +99,31 @@ pages(): number[] {
 
   
   openModal(): void {
-    this.form = { title: '', summary: '', content: '', category: ArticleCategory.ACTUALITE, status: ArticleStatus.DRAFT, featured: false };
+    this.form = { title: '', summary: '', content: '', category: ArticleCategory.ACTUALITE, status: ArticleStatus.DRAFT, featured: false,  images: [] };
      this.selectedImage = null;
+     this.selectedImages= [];
+    this.selectedFile= null;
   this.fileError = false;
     this.editingArticle.set(null);
     this.showModal.set(true);
+    
   }
   
   closeModal(form?: NgForm): void {
     this.showModal.set(false);
     this.editingArticle.set(null);
     this.selectedImage = null;
+     this.selectedImages= [];
+    this.selectedFile= null;
     this.fileError = false;
     form?.resetForm();
   }
 
 
   
-  onFileSelected(event: Event): void {
+
+  
+  onFileSelected1(event: Event): void {
   const input = event.target as HTMLInputElement;
 
   if (!input.files || input.files.length === 0) {
@@ -143,6 +153,115 @@ pages(): number[] {
   this.fileError = false;
 }
 
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      this.selectedImages = [];
+      return;
+    }
+
+    const files = Array.from(input.files);
+
+    // =====================
+    // CAS ACTUALITE → IMAGES MULTIPLES
+    // =====================
+    if (this.form.category === 'ACTUALITE') {
+      const validImages = files.filter(file => file.type.startsWith('image/'));
+
+      if (validImages.length !== files.length) {
+        alert('Certains fichiers ne sont pas des images');
+      }
+
+      if (validImages.length === 0) {
+        input.value = '';
+        this.selectedImages = [];
+        this.fileError = true;
+        return;
+      }
+
+      this.selectedImages = validImages;
+    }
+
+    // =====================
+    // AUTRES → UN SEUL PDF
+    // =====================
+    else {
+      const file = files[0];
+
+      if (file.type !== 'application/pdf') {
+        alert('Veuillez sélectionner un fichier PDF');
+        input.value = '';
+        this.selectedImages = [];
+        this.fileError = true;
+        return;
+      }
+
+      this.selectedImages = [file]; // toujours un tableau
+    }
+
+    this.fileError = false;
+  }
+
+
+
+  onFileSelected2(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      this.selectedImages = [];
+      this.selectedFile = null;
+      return;
+    }
+
+    const files = Array.from(input.files);
+
+    // =====================
+    // CAS ACTUALITE → IMAGES MULTIPLES
+    // =====================
+    if (this.form.category === 'ACTUALITE') {
+      const validImages: File[] = [];
+
+      for (const file of files) {
+        if (!file.type.startsWith('image/')) {
+          alert(`Le fichier ${file.name} n'est pas une image`);
+          continue;
+        }
+        validImages.push(file);
+      }
+
+      if (validImages.length === 0) {
+        input.value = '';
+        this.selectedImages = [];
+        this.fileError = true;
+        return;
+      }
+
+      this.selectedImages = validImages;
+      this.selectedFile = null; // reset PDF
+    }
+
+    // =====================
+    // AUTRES → UN SEUL PDF
+    // =====================
+    else {
+      const file = files[0];
+
+      if (file.type !== 'application/pdf') {
+        alert('Veuillez sélectionner un fichier PDF');
+        input.value = '';
+        this.selectedFile = null;
+        this.fileError = true;
+        return;
+      }
+
+      this.selectedFile = file;
+      this.selectedImages = []; // reset images
+    }
+
+    this.fileError = false;
+  }
+
 
 // Fonction viewArticle
 viewArticle(article: Article): void {
@@ -157,8 +276,11 @@ viewArticle(article: Article): void {
       content: article.content,
       category: article.category,
       status: article.status,
-      featured: article.featured
+      featured: article.featured,
+      images: article.images || []
     };
+    this.selectedImages = [];
+    this.selectedFile=null;
     this.editingArticle.set(article);
     this.showModal.set(true);
   }
@@ -168,7 +290,7 @@ saveArticle(form?: NgForm): void {
   if (!this.form.title || !this.form.content) return;
 
   // image obligatoire pour ACTUALITE
-  if (this.form.category === 'ACTUALITE' && !this.selectedImage) {
+  if (this.form.category === 'ACTUALITE' && !this.selectedImages) {
     this.fileError = true;
     return;
   }
@@ -188,7 +310,12 @@ saveArticle(form?: NgForm): void {
   const formData = new FormData();
   formData.append('article', new Blob([JSON.stringify(articleDTO)], { type: 'application/json' }));
   formData.append('authorId', '1');
-  if (this.selectedImage) formData.append('file', this.selectedImage);
+
+   // ✅ MULTI IMAGES
+  this.selectedImages.forEach(file => {
+    formData.append('file', file); // backend: List<MultipartFile> images
+  });
+  //if (this.selectedImage) formData.append('file', this.selectedImage);
 
   const request = editing
     ? this.apiService.updateArticle(editing.id, formData)
