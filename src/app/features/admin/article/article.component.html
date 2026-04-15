@@ -160,21 +160,15 @@
                 <textarea [(ngModel)]="form.summary" name="summary" rows="2" class="input resize-none"></textarea>
               </div>
               
-              <div>
-                <label class="label">Contenu <span class="text-red-500">*</span></label>
+            <theme-switcher />
+                  <div class="card">
+          <p-editor
+            [(ngModel)]="form.content"
+            name="content"
+            required>
+          </p-editor>
+                  </div>
 
-                <textarea [(ngModel)]="form.content"
-                          name="content"
-                          #content="ngModel"
-                          rows="6"
-                          class="input resize-none"
-                          required></textarea>
-
-                <p *ngIf="content.invalid && content.touched"
-                  class="text-sm text-red-500 mt-1">
-                  Le contenu est obligatoire
-                </p>
-              </div>
 
               
               <div class="grid grid-cols-2 gap-4">

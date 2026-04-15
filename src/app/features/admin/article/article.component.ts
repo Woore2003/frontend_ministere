@@ -4,11 +4,13 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { Article, ArticleCategory, Articlemage, ArticleStatus } from '../../../core/models';
 import { ApiService } from '../../../core/services/api.service';
 import { Router, RouterModule } from '@angular/router';
+import { EditorModule } from 'primeng/editor';
+import { ThemeSwitcher } from "./themeswitcher"; // Importez EditorModule
 
 @Component({
   selector: 'app-article',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, EditorModule, ThemeSwitcher],
   templateUrl: './article.component.html',
   styleUrls: ['./article.component.scss']
 })
@@ -21,6 +23,7 @@ notification = signal<{ show: boolean; message: string; type: 'success' | 'error
   type: 'success'
 });
 
+    text: string | undefined;
 
 selectedImages: File[] = []; // pour ACTUALITE
 selectedFile: File | null = null; // pour PDF
