@@ -156,8 +156,52 @@ pages(): number[] {
   this.fileError = false;
 }
 
+extractImagesFromContent(content: string): string[] {
+  const div = document.createElement('div');
+  div.innerHTML = content || '';
+
+  return Array.from(div.querySelectorAll('img'))
+    .map(img => img.getAttribute('src') || '')
+    .filter(src => src !== '');
+}
+
+
+async urlToFile(url: string, index: number): Promise<File> {
+  const response = await fetch(url);
+  const blob = await response.blob();
+
+  return new File([blob], `image-${index}.jpg`, {
+    type: blob.type || 'image/jpeg'
+  });
+}
+
+async updateSelectedImagesFromEditor() {
+  const urls = this.extractImagesFromContent(this.form.content);
+
+  this.selectedImages = await Promise.all(
+    urls.map((url, i) => this.urlToFile(url, i))
+  );
+}
+
+
+async save() {
+  await this.updateSelectedImagesFromEditor();
+
+  console.log(this.selectedImages); // File[]
+
+  const formData = new FormData();
+
+  this.selectedImages.forEach(file => {
+    formData.append('files', file);
+  });
+
+  
+}
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
+
+    
 
     if (!input.files || input.files.length === 0) {
       this.selectedImages = [];
@@ -423,6 +467,8 @@ deleteArticle(article: Article): void {
     });
   });
 }
+
+
 
   
 }

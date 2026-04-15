@@ -123,11 +123,19 @@
 
 
             <!-- Image en grand -->
-            @if (article()!.featuredImage && article()?.category === 'ACTUALITE') {
+             @if (article()?.category === 'ACTUALITE') {
+  
+            @if (article()?.images && article()!.images.length > 0) {
                 <div class="rounded-xl overflow-hidden shadow-lg mb-6">
-                <img [src]="getImageUrl(article()?.featuredImage)" [alt]="article()!.title" class="w-full h-auto object-cover">
+                <img 
+                    [src]="getImageUrl(article()!.images[0].imageUrl)" 
+                    [alt]="article()!.title" 
+                    class="w-full h-auto object-cover">
                 </div>
+            } 
+
             }
+            
 
             <!-- Contenu détaillé -->
           <!-- Contenu détaillé -->
@@ -186,13 +194,17 @@
                         <a class="flex items-center gap-4 cursor-pointer" [routerLink]="['/articles', agenda.id]">
 
                         <!-- Date -->
+                          @if (agenda.images && agenda.images.length > 0) {
                         <div class="flex-shrink-0 w-16 h-16 flex items-center justify-center">
+                          
                             <img 
-                            [src]="getImageUrl(agenda.featuredImage)" 
-                            alt="image agenda"
-                            class="w-16 h-16 object-cover rounded-md"
+                                [src]="getImageUrl(agenda.images[0].imageUrl)" 
+                                alt="image agenda"
+                                class="w-16 h-16 object-cover rounded-md"
                             />
+                            
                         </div>
+                        } 
 
                         <div class="flex-1">
 
