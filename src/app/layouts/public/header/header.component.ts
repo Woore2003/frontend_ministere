@@ -177,7 +177,12 @@ isRessourcesActive(): boolean {
   // Si la route actuelle contient une des routes enfants, parent devient actif
   return this.ressourcesRoutes.some(route => this.router.url.startsWith(route));
 }
-
+//Liste de toutes les routes enfants du menu Annonces
+annonceRoutes = ['/annonces/communiques','/annonces/recrutements','/annonces/stage'];
+isAnnoncesActive(): boolean {
+  //Si la route actuelle contient une des routes enfants, parent devient actif
+  return this.annonceRoutes.some(route=> this.router.url.startsWith(route));
+}
 // Liste des routes enfants du menu Ministère
 ministereRoutes = [
   '/ministere/ministre',

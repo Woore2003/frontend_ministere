@@ -24,8 +24,8 @@ import { interval, Subscription } from 'rxjs';
               Ministère de la Transition Digitale
             </div>
             <h1 class="text-4xl md:text-5xl font-bold text-slate-800 leading-tight mb-6">
-              Votre portail pour la 
-              <span class="text-primary-500">transformation digitale</span> 
+              Votre portail pour le
+              <span class="text-primary-500">Ministère de l'Agriculture</span>
               du Burkina Faso
             </h1>
             <p class="text-lg text-slate-600 mb-8 leading-relaxed">

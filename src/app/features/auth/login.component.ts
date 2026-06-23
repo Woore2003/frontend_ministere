@@ -32,7 +32,7 @@ import { AuthService } from '../../core/services/auth.service';
 
           <!-- Sigle du Ministère + Burkina Faso -->
           <div class="flex flex-col leading-tight justify-center">
-            <span class="text-xl font-bold text-slate-900">MTDPCE</span>
+            <span class="text-xl font-bold text-slate-900">MAERAH</span>
             <span class="text-sm font-medium text-danger-500">Burkina Faso</span>
           </div>
         </a>
