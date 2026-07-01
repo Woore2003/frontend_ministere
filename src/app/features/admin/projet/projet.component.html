@@ -40,14 +40,39 @@
             </td>
 
             <!-- Progression -->
-            <td class="px-6 py-4">
-                <div class="flex items-center gap-2">
-                <div class="w-24 bg-gray-200 rounded-full h-2 overflow-hidden">
-                    <div class="h-2 rounded-full transition-all" [class]="getProgressBarClass(project)" [style.width.%]="project.progressPercentage"></div>
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-3">
+
+              <!-- Bouton - -->
+              <button
+                (click)="changeProgress(project, -1)"
+                class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-100 transition">
+                -
+              </button>
+
+              <!-- Barre -->
+              <div class="w-24 bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div
+                  class="h-2 rounded-full transition-all duration-300"
+                  [class]="getProgressBarClass(project)"
+                  [style.width.%]="project.progressPercentage">
                 </div>
-                <span class="text-sm text-gray-600">{{ project.progressPercentage }}%</span>
-                </div>
-            </td>
+              </div>
+
+              <!-- Pourcentage -->
+              <span class="text-sm text-gray-600 w-10 text-center">
+                {{ project.progressPercentage }}%
+              </span>
+
+              <!-- Bouton + -->
+              <button
+                (click)="changeProgress(project, 1)"
+                class="w-7 h-7 flex items-center justify-center border border-green-500 text-green-600 rounded-full hover:bg-green-50 transition">
+                +
+              </button>
+
+            </div>
+          </td>
 
             <!-- Partenaire -->
             <td class="px-6 py-4 text-sm text-gray-500">{{ project.partner || '-' }}</td>

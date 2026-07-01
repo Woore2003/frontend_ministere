@@ -193,7 +193,9 @@ getArticlesByCategory(category: string, page: number = 0, size: number = 10): Ob
   deleteArticle(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.API_URL}/articles/${id}`);
   }
-
+  deleteMinistre(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.API_URL}/ministres/${id}`);
+  }
   // ============ PUBLIC PROJECTS ============
   getPublicProjects(page = 0, size = 10): Observable<ApiResponse<Page<Project>>> {
     const params = new HttpParams().set('page', page).set('size', size);

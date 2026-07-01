@@ -25,7 +25,7 @@ updateOrg(id: number, formData: FormData): Observable<ApiResponse<Organigramme>>
 
 
   deleteOrg(id: number): Observable<ApiResponse<void>> {
-    return this.http.delete<ApiResponse<void>>(`${this.API_URL}/structures/${id}`);
+    return this.http.delete<ApiResponse<void>>(`${this.API_URL}/ministres/${id}`);
   }
   
    getAllOrg(page = 0, size = 10, sortBy = 'createdAt', sortDir = 'desc'): Observable<ApiResponse<Page<Organigramme>>> {

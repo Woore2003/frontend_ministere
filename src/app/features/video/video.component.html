@@ -1,0 +1,49 @@
+<!--Bannière-->
+    <div class="bg-gradient-to-r from-green-700 to-green-600 py-12">
+      <div class="container mx-auto px-4">
+        <h1 class="text-3xl font-bold text-white mb-2">Videos</h1>
+        <nav class="text-green-100 text-sm">
+          <a routerLink="/" class="hover:text-white">Accueil</a>
+          <span class="mx-2">›</span>
+          <a routerLink="/ministere/ministre" class="hover:text-white">Ressources</a>
+          <span class="mx-2">›</span>
+          <span class="text-white">Videos</span>
+        </nav>
+      </div>
+    </div>
+<!--Fin de la bannière-->
+<section class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-5xl mx-auto">
+            <div *ngIf="video() && video().length > 0; else noData"> 
+                <div class="grid gap-8">
+                    <div *ngFor="let video of video(); trackBy: trackById" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow">
+                        <div class="p-6">
+                        <div class="flex items-start gap-6">
+                            <!-- Logo ou fallback -->
+                            <div class="w-20 h-20 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            
+                                <ng-template #svgFallback>
+                                    <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                            d="M3 21h18M4 21V7l8-4 8 4v14M9 21V9h6v12M9 13h6"/>
+                                    </svg>
+                                </ng-template>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <ng-template #noData>
+                <div class="text-center py-12">
+                    <svg class="mx-auto w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m16 0v-2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2m16 0v-2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2m-6 0v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m16 0v-2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2"/>
+                    </svg>
+                    <h3 class="mt-2 text-lg font-medium text-gray-900">Aucune vidéo trouvée</h3>
+                    <p class="mt-1 text-gray-500">Essayez avec d'autres critères de recherche.</p>
+                </div> 
+              </ng-template>
+        </div>
+        </div>
+    </section>

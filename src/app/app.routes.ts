@@ -17,14 +17,30 @@ export const routes: Routes = [
       { path: 'contact', loadComponent: () => import('./features/contact/contact/contact.component').then(m => m.ContactComponent) },
       { path: 'ministere/ministre', loadComponent: () => import('./features/ministere/ministre/ministre.component').then(m => m.MinistreComponent) },
       { path: 'ministere/missions', loadComponent: () => import('./features/ministere/mission/mission.component').then(m => m.MissionComponent) },
+
+      // Projets et programmes routes
       { path: 'ministere/organigramme', loadComponent: () => import('./features/ministere/organigramme/organigramme.component').then(m => m.OrganigrammeComponent) },
+      //****************** */
+
       { path: 'ministere/structures', loadComponent: () => import('./features/ministere/structurerattaches/structurerattaches.component').then(m => m.StructurerattachesComponent) },
+      {path: 'ministere/projets_programmes', loadComponent: () => import('./features/ministere/projets_programmes/projets_programmes.compnent').then(m => m.projets_programmesComponent) },
       { path: 'faq', loadComponent: () => import('./features/faq/faq.component').then(m => m.FAQComponent) },
+
+      //Photo component route
+      {path: 'ressources/photo', loadComponent: () => import('./features/photo/photo.component').then(m => m.PhotoComponent) },
+      //******************************* */
+
+      //Video component route
+      {path: 'ressources/video', loadComponent: () => import('./features/video/video.component').then(m => m.VideoComponent) },
+      //********************************* */
+
+      // Agritube component route
+      {path: 'ressources/agritube', loadComponent: () => import('./features/agritube/agritube.component').then(m => m.AgritubeComponent) },
       { path: 'services', loadComponent: () => import('./features/services/service/service.component').then(m => m.ServiceComponent) },
       { path: 'evenements', loadComponent: () => import('./features/events/evenements/evenements.component').then(m => m.EvenementsComponent) },
       { path: 'agendas', loadComponent: () => import('./features/agendas/agendas.component').then(m => m.AgendasComponent) },
       { path: 'agendas/:id', loadComponent: () => import('./features/agendas/detail-agenda/detail-agenda.component').then(m => m.DetailAgendaComponent) },
-     { path: 'communiques', loadComponent: () => import('./features/communiques/communiques.component').then(m => m.CommuniquesComponent) },
+      { path: 'annonces/communiques', loadComponent: () => import('./features/communiques/communiques.component').then(m => m.CommuniquesComponent) },
       
       // Redirections pour compatibilité
       { path: 'articles', redirectTo: 'actualites', pathMatch: 'full' },

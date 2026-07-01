@@ -1,3 +1,4 @@
+
 export interface Events {
   id: number;
   title: string;
@@ -199,4 +200,31 @@ export interface Etats {
   nom: string;
   valeur: string;
   
+}
+export interface ProjetsProgrammes {
+  id: number;
+  name: string;
+  description: string;
+  objectif: string;
+}
+export interface Photo{
+  id: number;
+  name: string;
+  description: string;
+  imageUrl: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface Video{
+  id:number;
+  name: string;
+  description: string;
+  videoUrl: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface agritube {
+  id:number;
+  name:string;
+  description:string;
 }

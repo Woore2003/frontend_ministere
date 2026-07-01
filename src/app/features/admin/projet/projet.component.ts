@@ -40,7 +40,8 @@ form: {
   objectives: string;
   partner: string;
   budget: number;
-  categorieProjetId: number; categorieProjetName: string;  type: ProjetType;
+  categorieProjetId: number;
+  categorieProjetName: string;  type: ProjetType;
 } = {
   name: '',
   description: '',
@@ -254,7 +255,36 @@ deleteProject(article: Project): void {
   });
 }
 
+  changeProgress(project: any, delta: number): void {
 
+    let newValue = (project.progressPercentage || 0) + delta;
+
+    // limites 0 - 100
+    if (newValue < 0) newValue = 0;
+    if (newValue > 100) newValue = 100;
+
+    const updatedProject = {
+      ...project,
+      progressPercentage: newValue
+    };
+
+    this.apiService.updateProject(project.id, updatedProject).subscribe({
+      next: (res) => {
+        if (res.success) {
+
+          // mise à jour UI sans reload
+          const updatedList = this.paginatedProjects().map(p =>
+            p.id === project.id
+              ? { ...p, progressPercentage: newValue }
+              : p
+          );
+
+          // ⚠️ adapte si tu utilises signal ou variable normale
+          this.projects.set(updatedList);
+        }
+      }
+    });
+  }
 
 
 }

@@ -28,7 +28,7 @@
          
         <!-- Vérifie s'il y a des niveaux / directions -->
         <ng-container *ngIf="niveaux() && niveaux().length > 0; else noData">
-           <div class="absolute left-6 top-0 bottom-0 w-1 bg-green-200 rounded"></div>
+           <div class="absolute left-6 top-0 bottom-0 w-1 bg-green-200 rounded"></div> 
 
           <!-- Boucle sur les niveaux -->
           <ng-container *ngFor="let niveau of niveaux(); let i = index">

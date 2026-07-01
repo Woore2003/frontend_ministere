@@ -241,7 +241,7 @@ saveArticle(form?: NgForm): void {
   
   deleteArticle1(article: Ministere): void {
     if (confirm(`Supprimer l'article "${article.nomGeneral}" ?`)) {
-      this.apiService.deleteArticle(article.id).subscribe({
+      this.apiService.deleteMinistre(article.id).subscribe({
         next: () => this.loadArticles()
       });
     }
