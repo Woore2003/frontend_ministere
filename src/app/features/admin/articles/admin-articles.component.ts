@@ -121,6 +121,8 @@ import { Article, ArticleCategory, ArticleStatus } from '../../../core/models';
                     <option value="PROJET">Projet</option>
                     <option value="RAPPORT">Rapport</option>
                     <option value="DISCOURS">Discours</option>
+                    <option value="MISSIONS">Missions</option>
+
                   </select>
                 </div>
                 <div>
@@ -246,7 +248,7 @@ export class AdminArticlesComponent implements OnInit {
   getCategoryLabel(category: string): string {
     const labels: Record<string, string> = {
       'ACTUALITE': 'Actualité', 'COMMUNIQUE': 'Communiqué', 'EVENEMENT': 'Événement',
-      'PROJET': 'Projet', 'RAPPORT': 'Rapport', 'DISCOURS': 'Discours'
+      'PROJET': 'Projet', 'RAPPORT': 'Rapport', 'DISCOURS': 'Discours','MISSIONS': 'Missions'
     };
     return labels[category] || category;
   }

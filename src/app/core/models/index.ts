@@ -64,7 +64,8 @@ export enum ArticleCategory {
   EVENEMENT = 'EVENEMENT',
   PROJET = 'PROJET',
   RAPPORT = 'RAPPORT',
-  DISCOURS = 'DISCOURS'
+  DISCOURS = 'DISCOURS',
+  MISSIONS = 'MISSIONS'
 }
 
 export enum ArticleStatus {

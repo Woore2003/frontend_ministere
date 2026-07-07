@@ -163,7 +163,7 @@ import { AuthService } from '../../core/services/auth.service';
           <a routerLink="/admin/organigramme" class="sidebar-item">Organigramme</a>
           <a routerLink="/admin/domains" class="sidebar-item">Domaines</a>
           <a routerLink="/admin/structures" class="sidebar-item">Structures</a>
-          <a routerLink="/admin/missions" class="sidebar-item">Attributions</a>
+          <a routerLink="/admin/missions" class="sidebar-item">Missions</a>
           <a routerLink="/admin/etats" class="sidebar-item">États</a>
 
         }
