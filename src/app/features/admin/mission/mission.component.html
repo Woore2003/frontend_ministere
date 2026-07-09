@@ -36,11 +36,11 @@
             </p>
             </td>
 
-            <td class="px-6 py-4">
+           <td class="px-6 py-4">
             <p class="text-xs text-neutral-400 truncate max-w-[250px]">
-                {{ project.description }}
+              {{ stripHtml(project.description) }}
             </p>
-            </td>
+          </td>
         
 
         <!-- Actions -->
@@ -146,13 +146,17 @@
 
                 <!-- Statut et Progression -->
                 
-                 <div>
-                    <label class="label">Description</label>
-                    <textarea [(ngModel)]="form.description" name="description" rows="2" class="input resize-none"></textarea>
-                </div>
-
+                <!-- Statut et Progression -->
+              <div>
+                <label class="label">Description</label>
+                <quill-editor
+                  [(ngModel)]="form.description"
+                  name="description"
+                  [modules]="quillModules"
+                  placeholder="Écrivez ici...">
+                </quill-editor>
+              </div>
                 <!-- Dates -->
-                
 
                 <!-- Partenaire et Budget -->
                

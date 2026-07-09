@@ -56,9 +56,9 @@
               
             ],
             "styles": [
+              "node_modules/quill/dist/quill.snow.css",
               "src/styles.scss",
               "node_modules/primeicons/primeicons.css"
-
             ]
           },
           "configurations": {

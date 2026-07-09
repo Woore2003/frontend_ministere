@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse, Page } from '../models';
-import { Domains, Etats, Ministre, Mission, Organigramme, Structure } from '../models/event.model';
+import { Domains, Etats, Ministre, Mission, Organigramme, ProjetsProgrammes, Structure } from '../models/event.model';
 
 @Injectable({
   providedIn: 'root'
@@ -246,6 +246,19 @@ getAllMinistrePub(): Observable<ApiResponse<Page<Ministre>>> {
     deleteEtats(id: number): Observable<ApiResponse<void>> {
       return this.http.delete<ApiResponse<void>>(`${this.API_URL}/statistiques/${id}`);
     }
+  // Projets & Programmes (backend: ProjectController)
+  getAllProjectsPublic(page = 0, size = 10): Observable<ApiResponse<Page<ProjetsProgrammes>>> {
+    const params = new HttpParams()
+      .set('page', page).set('size', size);
+    return this.http.get<ApiResponse<Page<ProjetsProgrammes>>>(`${this.API_URL}/projects/public`, { params });
+  }
 
+  getLatestProjectsPublic(): Observable<ApiResponse<ProjetsProgrammes[]>> {
+    return this.http.get<ApiResponse<ProjetsProgrammes[]>>(`${this.API_URL}/projects/public/latest`);
+  }
+
+  getProjectByIdPublic(id: number): Observable<ApiResponse<ProjetsProgrammes>> {
+    return this.http.get<ApiResponse<ProjetsProgrammes>>(`${this.API_URL}/projects/public/${id}`);
+  }
 
 }
