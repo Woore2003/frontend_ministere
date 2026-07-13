@@ -1,0 +1,63 @@
+<div class="rte-wrapper" [class.disabled]="disabled">
+  <div class="rte-toolbar">
+    <!-- Style de paragraphe -->
+    <select class="rte-select" (change)="onFormatBlock($event)">
+      <option value="p" selected>Normal</option>
+      <option value="h1">Titre 1</option>
+      <option value="h2">Titre 2</option>
+      <option value="h3">Titre 3</option>
+      <option value="blockquote">Citation</option>
+    </select>
+
+    <!-- Police -->
+    <select class="rte-select" (change)="onFontName($event)">
+      <option value="sans-serif" selected>Sans Serif</option>
+      <option value="serif">Serif</option>
+      <option value="monospace">Monospace</option>
+    </select>
+
+    <span class="rte-sep"></span>
+
+    <button type="button" class="rte-btn" (click)="exec('bold')" title="Gras"><b>B</b></button>
+    <button type="button" class="rte-btn" (click)="exec('italic')" title="Italique"><i>I</i></button>
+    <button type="button" class="rte-btn" (click)="exec('underline')" title="Souligné"><u>U</u></button>
+
+    <span class="rte-sep"></span>
+
+    <label class="rte-btn color-btn" title="Couleur du texte">
+      A
+      <input type="color" (change)="onTextColor($event)" />
+    </label>
+    <label class="rte-btn color-btn" title="Surligner">
+      <span class="highlight-icon">🖌</span>
+      <input type="color" (change)="onHighlight($event)" />
+    </label>
+
+    <span class="rte-sep"></span>
+
+    <button type="button" class="rte-btn" (click)="exec('insertOrderedList')" title="Liste numérotée">1.</button>
+    <button type="button" class="rte-btn" (click)="exec('insertUnorderedList')" title="Liste à puces">•</button>
+    <button type="button" class="rte-btn" (click)="exec('justifyLeft')" title="Aligner">☰</button>
+
+    <span class="rte-sep"></span>
+
+    <button type="button" class="rte-btn" (click)="insertLink()" title="Insérer un lien">🔗</button>
+    <button type="button" class="rte-btn" (click)="insertImage()" title="Insérer une image">🖼</button>
+    <button type="button" class="rte-btn" (click)="toggleCodeBlock()" title="Code">&lt;/&gt;</button>
+
+    <span class="rte-sep"></span>
+
+    <button type="button" class="rte-btn" (click)="clearFormatting()" title="Effacer la mise en forme">
+      T<sub>x</sub>
+    </button>
+  </div>
+
+  <div
+    #editor
+    class="rte-content"
+    contenteditable="true"
+    [attr.data-placeholder]="placeholder"
+    (input)="updateContent()"
+    (blur)="onBlur()"
+  ></div>
+</div>

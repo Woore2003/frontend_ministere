@@ -51,9 +51,9 @@ loadDomaines() {
   }
 
 
- loadProjetsProgrammes() {
+  loadProjetsProgrammes() {
     this.loading.set(true);
-    this.ProjetsProgrammesService.getAllTruc().subscribe({
+    this.ProjetsProgrammesService.getAllProjectsPublic().subscribe({
       next: (response: any) => {
         this.ProjetsProgrammes.set(response.data.content || []);
         console.log('ProjetsProgrammess:', this.ProjetsProgrammes());
@@ -65,7 +65,6 @@ loadDomaines() {
       }
     });
   }
-
 trackByAcronym(index: number, item: ProjetsProgrammes) {
   return item.id;
 }

@@ -23,6 +23,8 @@ export const routes: Routes = [
       //****************** */
 
       { path: 'ministere/structures', loadComponent: () => import('./features/ministere/structurerattaches/structurerattaches.component').then(m => m.StructurerattachesComponent) },
+      // Projets et programmes routes
+
       {path: 'ministere/projets_programmes', loadComponent: () => import('./features/ministere/projets_programmes/projets_programmes.compnent').then(m => m.projets_programmesComponent) },
       { path: 'faq', loadComponent: () => import('./features/faq/faq.component').then(m => m.FAQComponent) },
 

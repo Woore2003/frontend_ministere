@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { Ministere, Mission } from '../../../core/models/event.model';
 import { MinistereService } from '../../../core/services/ministere.service';
 import { ApiService } from '../../../core/services/api.service';
-
+import { QuillModule } from 'ngx-quill';
 @Component({
   selector: 'app-mission',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, QuillModule],
   templateUrl: './mission.component.html',
   styleUrls: ['./mission.component.scss']
 })
@@ -52,7 +52,25 @@ ngOnInit(): void {
   this.loadProjects(); this.loadMin();
 }
 
-
+  quillModules = {
+    toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      [{ font: [] }],
+      ['bold', 'italic', 'underline'],
+      [{ color: [] }, { background: [] }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ align: [] }],
+      ['link', 'image'],
+      ['code-block'],
+      ['clean']
+    ]
+  };
+  stripHtml(html: string): string {
+    if (!html) return '';
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
+  }
 // Charger tous les projets
 loadProjects(): void {
   this.loading.set(true);
