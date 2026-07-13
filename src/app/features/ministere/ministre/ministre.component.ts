@@ -9,7 +9,7 @@ import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-ministre',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './ministre.component.html',
   styleUrls: ['./ministre.component.scss']
 })
@@ -24,6 +24,7 @@ articles = signal<Ministere[]>([]);
 
  ministres = signal<Ministre[]>([]);
  ministre= signal<Ministre | null>(null);
+ ministresActifs = signal<Ministre[]>([])
   loading = signal(true);
    constructor(private apiService: ApiService, private router: Router, private min: MinistereService) {}
   
@@ -89,19 +90,15 @@ articles = signal<Ministere[]>([]);
             this.ministres.set(response.data.content);
 
             // Récupérer l'ID du premier ministère
-            const ministreIdsArray = this.ministres(); // <-- important !
+               const actifs = this.ministres().filter(m => m.isActif);
+              this.ministresActifs.set(actifs);
 
-            if (ministreIdsArray.length > 0) {
-              const ministreId = ministreIdsArray[0].id;
-              this.loadMinistreById(ministreId);
-            }
-
-          
-          }
-          this.loading.set(false);
-        },
-        error: () => {
-          this.loading.set(false);
+                
+                }
+                this.loading.set(false);
+              },
+              error: () => {
+                this.loading.set(false);
         }
       });
     }

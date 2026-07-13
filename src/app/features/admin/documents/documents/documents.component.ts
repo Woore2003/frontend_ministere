@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 
 import { ApiService } from '../../../../core/services/api.service';
 import { FormsModule } from '@angular/forms';
@@ -9,7 +9,7 @@ import { environment } from '../../../../../environments/environment';
 @Component({
   selector: 'app-documents',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgClass],
   templateUrl: './documents.component.html',
   styleUrls: ['./documents.component.scss']
 })
@@ -55,7 +55,7 @@ totalPages = signal(1);
   loadDocuments(page: number = 0): void {
     this.loading.set(true);
     this.apiService.getAllDocuments(page, this.pageSize).subscribe({
-      next: (response) => { 
+      next: (response: any) => { 
         if (response.success) {
           this.documents.set(response.data.content); 
            // totalPages vient du backend
@@ -134,7 +134,7 @@ loadProjects(): void {
   
 
   this.apiService.getAllTypes().subscribe({
-    next: (response) => {
+    next: (response: any) => {
       console.log("RESPONSE =", response); // 👈 ici le tableau
 
       this.projects.set(response); // ✅ DIRECTEMENT
@@ -142,7 +142,7 @@ loadProjects(): void {
 
       
     },
-    error: (err) => {
+    error: (err: any) => {
       console.error("Erreur API", err);
       
     }
@@ -169,7 +169,7 @@ onFileSelected(event: Event) {
   
   saveDocument(): void {
   if (!this.form.title) return;
-  const selectedType = this.projects().find(t => t.id == this.form.typeId);
+  const selectedType = this.projects().find((t: TypeDocument) => t.id == this.form.typeId);
 
   const typeName = selectedType?.name;
 
@@ -202,7 +202,7 @@ onFileSelected(event: Event) {
     : this.apiService.createDocument(formData);
 
   request.subscribe({
-    next: (response) => {
+    next: (response: any) => {
       if (response.success) {
         this.loadDocuments();
         this.closeModal();
@@ -211,7 +211,7 @@ onFileSelected(event: Event) {
       this.showNotification(editing ? "Document mis à jour avec succès" : "Document créé avec succès", 'success');
 
     },
-    error: (err) => {
+    error: (err:any) => {
       console.error('Erreur lors de la sauvegarde', err);
       this.saving.set(false);
       this.showNotification("Erreur lors de la sauvegarde", 'error');
@@ -235,7 +235,7 @@ onFileSelected(event: Event) {
 
   showNotification(message: string, type: 'success' | 'error' | 'info' = 'success', duration = 2000) {
   this.notification.set({ show: true, message, type });
-  setTimeout(() => this.notification.update(n => ({ ...n, show: false })), duration);
+  setTimeout(() => this.notification.update((n: { show: boolean; message: string; type: 'success' | 'error' | 'info' }) => ({ ...n, show: false })), duration);
 
 
 }
@@ -252,8 +252,8 @@ openConfirmModal(message: string, onConfirm: () => void) {
   this.confirmModal.set({ show: true, message, onConfirm });
 }
 
-closeConfirmModal() {
-  this.confirmModal.update(c => ({ ...c, show: false }));
+  closeConfirmModal() {
+  this.confirmModal.update((c: { show: boolean; message: string; onConfirm: () => void }) => ({ ...c, show: false }));
 }
 
 deleteDocument(article: Document): void {
